@@ -132,11 +132,11 @@ public class Kalah {
         while(!validChoice){
           io.println("House is empty. Move again.");
           io.println("+----+-------+-------+-------+-------+-------+-------+----+"); 
-        io.println("| P2 | 6["+String.format("%2d",p2Houses[6])+"] | 5["+String.format("%2d",p2Houses[5])+"] | 4["+String.format("%2d",p2Houses[4])+"] | 3["+String.format("%2d",p2Houses[3])+"] | 2["+String.format("%2d",p2Houses[2])+"] | 1["+String.format("%2d",p2Houses[1])+"] | " +String.format("%2d",p1Houses[0])+" |");
-        io.println("|    |-------+-------+-------+-------+-------+-------|    |");
-        io.println("| "+String.format("%2d",p2Houses[0])+" | 1["+String.format("%2d",p1Houses[1])+"] | 2["+String.format("%2d",p1Houses[2])+"] | 3["+String.format("%2d",p1Houses[3])+"] | 4["+String.format("%2d",p1Houses[4])+"] | 5["+String.format("%2d",p1Houses[5])+"] | 6["+String.format("%2d",p1Houses[6])+"] | P1 |");
-        io.println("+----+-------+-------+-------+-------+-------+-------+----+");
-        choice =  io.readInteger("Player P2's turn - Specify house number or 'q' to quit: ",1,6,-1,"q");
+		  io.println("| P2 | 6["+String.format("%2d",p2Houses[6])+"] | 5["+String.format("%2d",p2Houses[5])+"] | 4["+String.format("%2d",p2Houses[4])+"] | 3["+String.format("%2d",p2Houses[3])+"] | 2["+String.format("%2d",p2Houses[2])+"] | 1["+String.format("%2d",p2Houses[1])+"] | " +String.format("%2d",p1Houses[0])+" |");
+		  io.println("|    |-------+-------+-------+-------+-------+-------|    |");
+	      io.println("| "+String.format("%2d",p2Houses[0])+" | 1["+String.format("%2d",p1Houses[1])+"] | 2["+String.format("%2d",p1Houses[2])+"] | 3["+String.format("%2d",p1Houses[3])+"] | 4["+String.format("%2d",p1Houses[4])+"] | 5["+String.format("%2d",p1Houses[5])+"] | 6["+String.format("%2d",p1Houses[6])+"] | P1 |");
+	      io.println("+----+-------+-------+-------+-------+-------+-------+----+");
+		  choice =  io.readInteger("Player P2's turn - Specify house number or 'q' to quit: ",1,6,-1,"q");
 
 
           if(p2Houses[choice] != 0)
@@ -148,11 +148,11 @@ public class Kalah {
 
           io.println("Game over");
           io.println("+----+-------+-------+-------+-------+-------+-------+----+"); 
-        io.println("| P2 | 6["+String.format("%2d",p2Houses[6])+"] | 5["+String.format("%2d",p2Houses[5])+"] | 4["+String.format("%2d",p2Houses[4])+"] | 3["+String.format("%2d",p2Houses[3])+"] | 2["+String.format("%2d",p2Houses[2])+"] | 1["+String.format("%2d",p2Houses[1])+"] | "+ String.format("%2d",p1Houses[0])+" |");
-        io.println("|    |-------+-------+-------+-------+-------+-------|    |");
-        io.println("| "+String.format("%2d",p2Houses[0])+" | 1["+String.format("%2d",p1Houses[1])+"] | 2["+String.format("%2d",p1Houses[2])+"] | 3["+String.format("%2d",p1Houses[3])+"] | 4["+String.format("%2d",p1Houses[4])+"] | 5["+String.format("%2d",p1Houses[5])+"] | 6["+String.format("%2d",p1Houses[6])+"] | P1 |");
-        io.println("+----+-------+-------+-------+-------+-------+-------+----+");
-			  isGameOver= true;
+          io.println("| P2 | 6["+String.format("%2d",p2Houses[6])+"] | 5["+String.format("%2d",p2Houses[5])+"] | 4["+String.format("%2d",p2Houses[4])+"] | 3["+String.format("%2d",p2Houses[3])+"] | 2["+String.format("%2d",p2Houses[2])+"] | 1["+String.format("%2d",p2Houses[1])+"] | "+ String.format("%2d",p1Houses[0])+" |");
+          io.println("|    |-------+-------+-------+-------+-------+-------|    |");
+          io.println("| "+String.format("%2d",p2Houses[0])+" | 1["+String.format("%2d",p1Houses[1])+"] | 2["+String.format("%2d",p1Houses[2])+"] | 3["+String.format("%2d",p1Houses[3])+"] | 4["+String.format("%2d",p1Houses[4])+"] | 5["+String.format("%2d",p1Houses[5])+"] | 6["+String.format("%2d",p1Houses[6])+"] | P1 |");
+          io.println("+----+-------+-------+-------+-------+-------+-------+----+");
+		  isGameOver= true;
           break;
         }
 
@@ -191,7 +191,7 @@ public class Kalah {
 
 		   if(!p1Turn && choice == 0){  //at p2 store on p1Turn
 			 p1HouseChosen = false;
-        	choice++;
+        	 choice++;
 		 	}
 		 	else if(p1Turn && choice ==0){  // At my store on my turn
 			  p1Houses[choice]++;
@@ -205,26 +205,25 @@ public class Kalah {
 			  nSeedsLeft--;
         	  choice++;
 			  
-		  }else{
-			  if(nSeedsLeft ==1){
-				  
-				  if(p1Houses[choice] == 0 && p1Turn && p2Houses[7-choice]!=0){
-					  int capturedSeeds = p2Houses[7-choice]+1;
-            p2Houses[7-choice] = 0;
-					  p1Houses[choice] = 0;
-					  p1Houses[0] += capturedSeeds;
-				  }else{
-					  p1Houses[choice]++;
-				  }
-          p1Turn = !p1Turn;
-          
-          
-			  }else{
-				  p1Houses[choice]++;
-			  }
-			  nSeedsLeft--;
-        	choice++;
-		  }
+		 	 }else{
+				if(nSeedsLeft ==1){
+					if(p1Houses[choice] == 0 && p1Turn && p2Houses[7-choice]!=0){
+						int capturedSeeds = p2Houses[7-choice]+1;
+						p2Houses[7-choice] = 0;
+						p1Houses[choice] = 0;
+						p1Houses[0] += capturedSeeds;
+					}else{
+						p1Houses[choice]++;
+						
+					}
+					p1Turn = !p1Turn;
+					//p1Turn = false;
+				}else{
+					p1Houses[choice]++;
+				}
+			  	nSeedsLeft--;
+        		choice++;
+		    }
 
           
           
@@ -262,6 +261,7 @@ public class Kalah {
             
 				  }
          			p1Turn = !p1Turn;
+					 //p1Turn = true;
 			  }else{
 				  p2Houses[choice]++;
 			  }
@@ -275,17 +275,16 @@ public class Kalah {
 
 
         }
-        //nSeedsLeft--;
-        //choice++;
         
-    }
-		//p1Turn = !p1Turn;
+      }
 
 		if(checkGameOver(p1Turn)){
-      io.println("Game over");
-	  isGameOver = true;
+			io.println("Game over");
+			isGameOver = true;
     	}
-    }
+
+
+    }// while game ends
     
     
     
