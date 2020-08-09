@@ -10,281 +10,282 @@ import com.qualitascorpus.testsupport.MockIO;
 
  
 public class Kalah {
-  private int[] p1Houses = {0,4,4,4,4,4,4};
+  private int[] player1HouseArray = {0,4,4,4,4,4,4};  
+  private int[] player2HouseArray = {0,4,4,4,4,4,4};
+  private int currentHouseIndex;
+  private boolean onPlayer1Row = true;
+  private boolean playerQuit = false;
+  private boolean isPlayer1Turn = true;	
   
-  private int[] p2Houses = {0,4,4,4,4,4,4};
+  
 
   
-  
+  public static IO io;
 
-  public boolean checkGameOver(boolean p1Turn){
+  private boolean checkGameOver(IO io){
     boolean gameOver = false;
-    boolean p1HousesClear = true;
-    boolean p2HousesClear = true;
+    boolean player1HouseArrayClear = true;
+    boolean player2HouseArrayClear = true;
+	
 
 
     
-    for(int i=0;i<p1Houses.length; i++){
-      if(p1Houses[i] != 0)
-        p1HousesClear= false;
+    for(int i=1;i<player1HouseArray.length; i++){
+      if(player1HouseArray[i] != 0)
+        player1HouseArrayClear= false;
     }
-    for(int i =0;i<p2Houses.length;i++){
-      if(p2Houses[i] != 0){
-        p2HousesClear = false;
+    for(int i =1;i<player2HouseArray.length;i++){
+      if(player2HouseArray[i] != 0){
+        player2HouseArrayClear = false;
       }
     }
 
     
-    if( (p1Turn && p1HousesClear) || (!p1Turn && p2HousesClear) ){
+    if( (isPlayer1Turn && player1HouseArrayClear) || (!isPlayer1Turn && player2HouseArrayClear) || playerQuit){
       gameOver= true;
     }
+    
+	
 
-
+    if(gameOver){
+      setGameOver(io);
+    }
     return gameOver;
     
   }
 
-  public static void printGameBoard(IO io){
-    
-  }
+
+
+
+	private void printGameBoard(IO io){
+		io.println("+----+-------+-------+-------+-------+-------+-------+----+"); 
+        io.println("| P2 | 6["+String.format("%2d",player2HouseArray[6])+"] | 5["+String.format("%2d",player2HouseArray[5])+"] | 4["+String.format("%2d",player2HouseArray[4])+"] | 3["+String.format("%2d",player2HouseArray[3])+"] | 2["+String.format("%2d",player2HouseArray[2])+"] | 1["+String.format("%2d",player2HouseArray[1])+"] | " +String.format("%2d",player1HouseArray[0])+" |");
+        io.println("|    |-------+-------+-------+-------+-------+-------|    |");
+        io.println("| "+String.format("%2d",player2HouseArray[0])+" | 1["+String.format("%2d",player1HouseArray[1])+"] | 2["+String.format("%2d",player1HouseArray[2])+"] | 3["+String.format("%2d",player1HouseArray[3])+"] | 4["+String.format("%2d",player1HouseArray[4])+"] | 5["+String.format("%2d",player1HouseArray[5])+"] | 6["+String.format("%2d",player1HouseArray[6])+"] | P1 |");
+        io.println("+----+-------+-------+-------+-------+-------+-------+----+");
+	}
   
+
+
 	public static void main(String[] args) {
 		new Kalah().play(new MockIO());
 	}
 
-  
+
+
+
+	private int getUsercurrentHouseIndex(IO io,int playerTurn){
+
+		boolean validcurrentHouseIndex = true;
+        
+        currentHouseIndex =  io.readInteger("Player P"+playerTurn+"'s turn - Specify house number or 'q' to quit: ",1,6,-1,"q");
+        
+        if(currentHouseIndex !=-1){
+          if(playerTurn == 1){
+            if(player1HouseArray[currentHouseIndex] == 0)
+                  validcurrentHouseIndex = false;
+          }else{
+            if(player2HouseArray[currentHouseIndex] == 0)
+                  validcurrentHouseIndex = false;
+          }
+          
+		    }
+        
+        while(!validcurrentHouseIndex){
+          io.println("House is empty. Move again.");
+          printGameBoard(io);
+          currentHouseIndex =  io.readInteger("Player P"+playerTurn+"'s turn - Specify house number or 'q' to quit: ",1,6,-1,"q");
+
+          if(currentHouseIndex == -1){
+            return currentHouseIndex;
+          }else{
+            if(playerTurn==1){
+              if(player1HouseArray[currentHouseIndex] != 0)
+                      validcurrentHouseIndex = true;
+            }else{
+              if(player2HouseArray[currentHouseIndex] != 0)
+                      validcurrentHouseIndex = true;
+            }	
+          }
+          
+        }
+
+		return currentHouseIndex;
+        
+
+	}
+
+
+	private void spreadSeeds(int nSeedsLeft){
+		while(nSeedsLeft>0 && !playerQuit){
+			boolean lastSeed = (nSeedsLeft-1 == 0);
+
+			if(currentHouseIndex>6){
+					currentHouseIndex=0;
+			}
+        
+			if(onPlayer1Row){
+				if(!isPlayer1Turn && currentHouseIndex == 0){ 
+					onPlayer1Row = false;
+				}else if(isPlayer1Turn && currentHouseIndex ==0){ 
+					player1HouseArray[currentHouseIndex]++;
+					if(lastSeed){ 
+						isPlayer1Turn= true;
+						onPlayer1Row = true;
+					}else{
+						onPlayer1Row = false;
+					}
+					nSeedsLeft--;
+					
+				}else{
+					if(lastSeed){
+						if(player1HouseArray[currentHouseIndex] == 0 && isPlayer1Turn && player2HouseArray[7-currentHouseIndex]!=0){
+							int otherSideHouseIndex = 7 - currentHouseIndex;
+							int capturedSeeds = player2HouseArray[otherSideHouseIndex]+1;
+							player2HouseArray[otherSideHouseIndex] = 0;
+							player1HouseArray[currentHouseIndex] = 0;
+							player1HouseArray[0] += capturedSeeds;
+						}else{
+							player1HouseArray[currentHouseIndex]++;
+								
+						}
+							isPlayer1Turn = !isPlayer1Turn;
+					}else{
+						player1HouseArray[currentHouseIndex]++;
+					}
+					nSeedsLeft--;
+				}
+			}else if(!onPlayer1Row){ 
+
+				if(isPlayer1Turn && currentHouseIndex == 0){  
+					onPlayer1Row = true;
+				}
+				else  if(!isPlayer1Turn && currentHouseIndex ==0){ 
+					player2HouseArray[currentHouseIndex]++;
+					
+					if(lastSeed){ 
+						isPlayer1Turn= false;
+						onPlayer1Row = false;
+					}else{
+						onPlayer1Row = true;
+					}
+					nSeedsLeft--;
+				}else{
+					if(lastSeed){
+						if(player2HouseArray[currentHouseIndex] == 0 && !isPlayer1Turn && player1HouseArray[7-currentHouseIndex]!=0){ 
+							int otherSideHouseIndex = 7 - currentHouseIndex;
+							int capturedSeeds = player1HouseArray[otherSideHouseIndex]+1;
+							player1HouseArray[otherSideHouseIndex] = 0;
+							player2HouseArray[currentHouseIndex] = 0;
+							player2HouseArray[0] += capturedSeeds;
+						}else{
+							player2HouseArray[currentHouseIndex]++;
+					
+						}
+							isPlayer1Turn = !isPlayer1Turn;
+					}else{
+						player2HouseArray[currentHouseIndex]++;
+					}
+
+					nSeedsLeft--;
+				}
+			}
+			currentHouseIndex++;
+        
+    }
+	}
+
+
+
+
+
+
+
+	private void setGameOver(IO io){
+    
+    int player1Score =0;
+    int player2Score =0;
+    if(!playerQuit){
+      
+      for(int i=0;i<player1HouseArray.length;i++){
+        player1Score += player1HouseArray[i];
+        player2Score += player2HouseArray[i];
+      }
+
+    }
+
+    if(playerQuit){
+      io.println("Game over");
+      printGameBoard(io);
+    }else{
+      printGameBoard(io);
+      io.println("Game over");
+      printGameBoard(io);
+      io.println("	player 1:"+player1Score);	
+      io.println("	player 2:"+player2Score); 
+      if(player1Score>player2Score){
+        io.println("Player 1 wins!");
+      }else if(player2Score>player1Score){
+        io.println("Player 2 wins!");
+      }else{
+        io.println("A tie!");
+      }
+    }
+    playerQuit= true;
+
+	}
+
 	public void play(IO io) {
-
-    boolean p1Turn = true;
-    int choice = -1;
-    boolean p1HouseChosen = true;
-    boolean isGameOver = false;
+     currentHouseIndex = -1;
+    
 
 
-    while(!checkGameOver(p1Turn) && !isGameOver){
+    while(!checkGameOver(io)){
       
       int nSeedsLeft =0;
-
-        io.println("+----+-------+-------+-------+-------+-------+-------+----+"); 
-        io.println("| P2 | 6["+String.format("%2d",p2Houses[6])+"] | 5["+String.format("%2d",p2Houses[5])+"] | 4["+String.format("%2d",p2Houses[4])+"] | 3["+String.format("%2d",p2Houses[3])+"] | 2["+String.format("%2d",p2Houses[2])+"] | 1["+String.format("%2d",p2Houses[1])+"] | " +String.format("%2d",p1Houses[0])+" |");
-        io.println("|    |-------+-------+-------+-------+-------+-------|    |");
-        io.println("| "+String.format("%2d",p2Houses[0])+" | 1["+String.format("%2d",p1Houses[1])+"] | 2["+String.format("%2d",p1Houses[2])+"] | 3["+String.format("%2d",p1Houses[3])+"] | 4["+String.format("%2d",p1Houses[4])+"] | 5["+String.format("%2d",p1Houses[5])+"] | 6["+String.format("%2d",p1Houses[6])+"] | P1 |");
-        io.println("+----+-------+-------+-------+-------+-------+-------+----+");
+      printGameBoard(io);
 
 
+        if(isPlayer1Turn){
+        onPlayer1Row= true;
 
+        currentHouseIndex = getUsercurrentHouseIndex(io,1);
 
-
-
-
-
-
-      if(p1Turn){
-        p1HouseChosen= true;
-        boolean validChoice = true;
-        
-        choice =  io.readInteger("Player P1's turn - Specify house number or 'q' to quit: ",1,6,-1,"q");
-        
-        if(choice !=-1)
-          if(p1Houses[choice] == 0 )
-            validChoice = false;
-
-        while(!validChoice){
-          io.println("House is empty. Move again.");
-          io.println("+----+-------+-------+-------+-------+-------+-------+----+"); 
-        io.println("| P2 | 6["+String.format("%2d",p2Houses[6])+"] | 5["+String.format("%2d",p2Houses[5])+"] | 4["+String.format("%2d",p2Houses[4])+"] | 3["+String.format("%2d",p2Houses[3])+"] | 2["+String.format("%2d",p2Houses[2])+"] | 1["+String.format("%2d",p2Houses[1])+"] | " +String.format("%2d",p1Houses[0])+" |");
-        io.println("|    |-------+-------+-------+-------+-------+-------|    |");
-        io.println("| "+String.format("%2d",p2Houses[0])+" | 1["+String.format("%2d",p1Houses[1])+"] | 2["+String.format("%2d",p1Houses[2])+"] | 3["+String.format("%2d",p1Houses[3])+"] | 4["+String.format("%2d",p1Houses[4])+"] | 5["+String.format("%2d",p1Houses[5])+"] | 6["+String.format("%2d",p1Houses[6])+"] | P1 |");
-        io.println("+----+-------+-------+-------+-------+-------+-------+----+");
-        choice =  io.readInteger("Player P1's turn - Specify house number or 'q' to quit: ",1,6,-1,"q");
-
-
-          if(p1Houses[choice] != 0)
-            validChoice = false;
-        }
-        
-        
-        if(choice==-1){
-
-          io.println("Game over");
-          io.println("+----+-------+-------+-------+-------+-------+-------+----+"); 
-          io.println("| P2 | 6["+String.format("%2d",p2Houses[6])+"] | 5["+String.format("%2d",p2Houses[5])+"] | 4["+String.format("%2d",p2Houses[4])+"] | 3["+String.format("%2d",p2Houses[3])+"] | 2["+String.format("%2d",p2Houses[2])+"] | 1["+String.format("%2d",p2Houses[1])+"] | "+ String.format("%2d",p1Houses[0])+" |");
-          io.println("|    |-------+-------+-------+-------+-------+-------|    |");
-          io.println("| "+String.format("%2d",p2Houses[0])+" | 1["+String.format("%2d",p1Houses[1])+"] | 2["+String.format("%2d",p1Houses[2])+"] | 3["+String.format("%2d",p1Houses[3])+"] | 4["+String.format("%2d",p1Houses[4])+"] | 5["+String.format("%2d",p1Houses[5])+"] | 6["+String.format("%2d",p1Houses[6])+"] | P1 |");
-          io.println("+----+-------+-------+-------+-------+-------+-------+----+");
-		      isGameOver= true;
+        if(currentHouseIndex==-1){
+          playerQuit =true;
+          setGameOver(io);
           break;
         }
 
-        nSeedsLeft = p1Houses[choice]; 
-        p1Houses[choice]=0;
+        nSeedsLeft = player1HouseArray[currentHouseIndex]; 
+        player1HouseArray[currentHouseIndex]=0;
+          
+          
+          }else{
         
-      }else{
-        p1HouseChosen=false;
+        onPlayer1Row=false;
 
-        boolean validChoice = true;
-
-        choice =  io.readInteger("Player P2's turn - Specify house number or 'q' to quit: ",1,6,-1,"q");
+        currentHouseIndex = getUsercurrentHouseIndex(io,2);
         
-        if(choice !=-1)
-          if(p2Houses[choice] == 0)
-            validChoice = false;
-        while(!validChoice){
-          io.println("House is empty. Move again.");
-          io.println("+----+-------+-------+-------+-------+-------+-------+----+"); 
-		  io.println("| P2 | 6["+String.format("%2d",p2Houses[6])+"] | 5["+String.format("%2d",p2Houses[5])+"] | 4["+String.format("%2d",p2Houses[4])+"] | 3["+String.format("%2d",p2Houses[3])+"] | 2["+String.format("%2d",p2Houses[2])+"] | 1["+String.format("%2d",p2Houses[1])+"] | " +String.format("%2d",p1Houses[0])+" |");
-		  io.println("|    |-------+-------+-------+-------+-------+-------|    |");
-	      io.println("| "+String.format("%2d",p2Houses[0])+" | 1["+String.format("%2d",p1Houses[1])+"] | 2["+String.format("%2d",p1Houses[2])+"] | 3["+String.format("%2d",p1Houses[3])+"] | 4["+String.format("%2d",p1Houses[4])+"] | 5["+String.format("%2d",p1Houses[5])+"] | 6["+String.format("%2d",p1Houses[6])+"] | P1 |");
-	      io.println("+----+-------+-------+-------+-------+-------+-------+----+");
-		  choice =  io.readInteger("Player P2's turn - Specify house number or 'q' to quit: ",1,6,-1,"q");
-
-
-          if(p2Houses[choice] != 0)
-            validChoice = false;
-        }
-
-
-        if(choice==-1){
-
-          io.println("Game over");
-          io.println("+----+-------+-------+-------+-------+-------+-------+----+"); 
-          io.println("| P2 | 6["+String.format("%2d",p2Houses[6])+"] | 5["+String.format("%2d",p2Houses[5])+"] | 4["+String.format("%2d",p2Houses[4])+"] | 3["+String.format("%2d",p2Houses[3])+"] | 2["+String.format("%2d",p2Houses[2])+"] | 1["+String.format("%2d",p2Houses[1])+"] | "+ String.format("%2d",p1Houses[0])+" |");
-          io.println("|    |-------+-------+-------+-------+-------+-------|    |");
-          io.println("| "+String.format("%2d",p2Houses[0])+" | 1["+String.format("%2d",p1Houses[1])+"] | 2["+String.format("%2d",p1Houses[2])+"] | 3["+String.format("%2d",p1Houses[3])+"] | 4["+String.format("%2d",p1Houses[4])+"] | 5["+String.format("%2d",p1Houses[5])+"] | 6["+String.format("%2d",p1Houses[6])+"] | P1 |");
-          io.println("+----+-------+-------+-------+-------+-------+-------+----+");
-		  isGameOver= true;
+        if(currentHouseIndex==-1){
+          playerQuit = true;
+          setGameOver(io);
           break;
         }
 
-        nSeedsLeft = p2Houses[choice];
-        p2Houses[choice]=0;
-        
-      }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      
-      choice++;
-      
-      while(nSeedsLeft>0 && !isGameOver){
-        
-        if(p1HouseChosen){ //P1 side
-          
-
-          if(choice>6){
-            choice=0;
-          }
-
-		   if(!p1Turn && choice == 0){  //at p2 store on p1Turn
-			 p1HouseChosen = false;
-        	 choice++;
-		 	}
-		 	else if(p1Turn && choice ==0){  // At my store on my turn
-			  p1Houses[choice]++;
-			  
-			  if(nSeedsLeft == 1){ // If it was the last seed
-				  p1Turn= true;
-				  p1HouseChosen = true;
-			  }else{
-				  p1HouseChosen = false;
-			  }
-			  nSeedsLeft--;
-        	  choice++;
-			  
-		 	 }else{
-				if(nSeedsLeft ==1){
-					if(p1Houses[choice] == 0 && p1Turn && p2Houses[7-choice]!=0){
-						int capturedSeeds = p2Houses[7-choice]+1;
-						p2Houses[7-choice] = 0;
-						p1Houses[choice] = 0;
-						p1Houses[0] += capturedSeeds;
-					}else{
-						p1Houses[choice]++;
-						
-					}
-					p1Turn = !p1Turn;
-					//p1Turn = false;
-				}else{
-					p1Houses[choice]++;
-				}
-			  	nSeedsLeft--;
-        		choice++;
-		    }
-
-          
-          
-          
-        }else if(!p1HouseChosen){  //P2 side
-			if(choice>6){
-            choice=0;
-          }
-
-		 if(p1Turn && choice == 0){  //at p2 store on p1Turn
-			 p1HouseChosen = true;
-        	choice++;
-		 }
-		 else  if(!p1Turn && choice ==0){  // At my store on my turn
-			  p2Houses[choice]++;
-			  
-			  if(nSeedsLeft == 1){ // If it was the last seed
-				  p1Turn= false;
-				  p1HouseChosen = false;
-			  }else{
-				  //p1Turn= true;
-				  p1HouseChosen = true;
-			  }
-			  nSeedsLeft--;
-        	choice++;
-		  }else{
-			  if(nSeedsLeft ==1){ //if the last seed 
-				  if(p2Houses[choice] == 0 && !p1Turn && p1Houses[7-choice]!=0){ //capture if the house empty on your side
-					  int capturedSeeds = p1Houses[7-choice]+1;
-            		  p1Houses[7-choice] = 0;
-					  p2Houses[choice] = 0;
-					  p2Houses[0] += capturedSeeds;
-				  }else{
-					  p2Houses[choice]++;
-            
-				  }
-         			p1Turn = !p1Turn;
-					 //p1Turn = true;
-			  }else{
-				  p2Houses[choice]++;
-			  }
-
-			  nSeedsLeft--;
-        		choice++;
-		  }
-
-          
-          
-
-
+        if(!playerQuit){
+          nSeedsLeft = player2HouseArray[currentHouseIndex];
+          player2HouseArray[currentHouseIndex]=0;
         }
         
+        
       }
-
-		if(checkGameOver(p1Turn)){
-			io.println("Game over");
-			isGameOver = true;
-    	}
-
-
-    }// while game ends
+        
+        if(!playerQuit){
+          currentHouseIndex++;
+          spreadSeeds(nSeedsLeft);
+        }
+    }
     
     
     
