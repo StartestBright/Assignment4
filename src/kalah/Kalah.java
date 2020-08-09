@@ -8,6 +8,69 @@ import com.qualitascorpus.testsupport.MockIO;
  * the test infrastructure.
  */
 
+ class GameBoard{
+	 IO io;
+	 public GameBoard(IO io){
+		 io = io;
+	 }
+	 
+	 public void printGameBoard(int[] player1HouseArray, int[] player2HouseArray){
+		io.println("+----+-------+-------+-------+-------+-------+-------+----+"); 
+        io.println("| P2 | 6["+String.format("%2d",player2HouseArray[6])+"] | 5["+String.format("%2d",player2HouseArray[5])+"] | 4["+String.format("%2d",player2HouseArray[4])+"] | 3["+String.format("%2d",player2HouseArray[3])+"] | 2["+String.format("%2d",player2HouseArray[2])+"] | 1["+String.format("%2d",player2HouseArray[1])+"] | " +String.format("%2d",player1HouseArray[0])+" |");
+        io.println("|    |-------+-------+-------+-------+-------+-------|    |");
+        io.println("| "+String.format("%2d",player2HouseArray[0])+" | 1["+String.format("%2d",player1HouseArray[1])+"] | 2["+String.format("%2d",player1HouseArray[2])+"] | 3["+String.format("%2d",player1HouseArray[3])+"] | 4["+String.format("%2d",player1HouseArray[4])+"] | 5["+String.format("%2d",player1HouseArray[5])+"] | 6["+String.format("%2d",player1HouseArray[6])+"] | P1 |");
+        io.println("+----+-------+-------+-------+-------+-------+-------+----+");
+	 }
+
+ }
+ 
+ class GameDataMAnager{
+	 private int[] player1HouseArray = {0,4,4,4,4,4,4};  
+  	 private int[] player2HouseArray; 
+
+	 public GameDataMAnager(int[] p1Array,int []p2Array){
+		 this.player1HouseArray = p1Array;
+		 this.player2HouseArray = p2Array;
+	 }
+
+	 public int[] getPlayerStat(int playerNum){
+		 if(playerNum == 1){
+			 return player1HouseArray;
+		 }else
+		 	 return player2HouseArray;
+	 }  
+	 public void setPlayer1Stat(int playerNum,int[] houseArray){
+		 if(playerNum ==1 ){
+			 for(int i=0;i<houseArray.length;i++){
+				player1HouseArray[i] = houseArray[i];
+			 }
+		 }else{
+			 for(int i=0;i<houseArray.length;i++){
+				 player2HouseArray[i] = houseArray[i];
+			 }
+		 }
+		 
+	 }
+
+	 
+
+ }
+ 
+ class Controller{
+
+	 private GameDataMAnager dataManager;
+
+	 public Controller(){
+		 int[] player1HouseArray = {0,4,4,4,4,4,4};  
+		 int[] player2HouseArray = {0,4,4,4,4,4,4};  
+		 dataManager = new GameDataMAnager(player1HouseArray,player2HouseArray);
+	 }
+
+	 public void spreadSeeds(){
+
+	 }
+ }
+
  
 public class Kalah {
   private int[] player1HouseArray = {0,4,4,4,4,4,4};  
@@ -20,7 +83,6 @@ public class Kalah {
   
 
   
-  public static IO io;
 
   private boolean checkGameOver(IO io){
     boolean gameOver = false;
