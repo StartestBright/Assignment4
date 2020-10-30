@@ -136,9 +136,9 @@ public class GameBoard {
         StringBuilder builder = new StringBuilder();
         builder.append("| ");
         // add player name
-        builder.append(players.get(1).getName());
+        builder.append(players.get(1).getPlayerName());
         // go through second players houses first
-        for (int i = numberOfHousesPerPlayer * 2; i > housePerPlayer; i--) {
+        for (int i = numberOfHousesPerPlayer * 2; i > numberOfHousesPerPlayer; i--) {
             int count = containers.get(i).getSeedCount();
             builder.append(" | ");
             builder.append(i - numberOfHousesPerPlayer);
